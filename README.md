@@ -1,2 +1,2 @@
 # PICDREAM-II
-Programmable PAL video generator for ATV
+Programmable PIC24F PAL video generator for ATV
