@@ -1,7 +1,7 @@
 /******************************************************************************
 *                PicDreamII_EEPROM.c
 * 
-* Ce programme est prévu pour fonctionner avec le programme
+* Ce programme est prÃ©vu pour fonctionner avec le programme
 * PicDreamII_EEPROM_juin15.s (mire en assembleur)
 * 
 *
@@ -11,19 +11,19 @@
 /* 
 Janvier 2018
 Notice:
-En mode scrolling le texte utile doit être précédé et suivi de 12 espaces, 
- ce qui est réalisé par le programme
-En mode fixe, la longueur du texte doit être de 12 caracteres,
-ce qui est réalisé par le programme
-Rappel pour écriture programme:
-Les variables communes doivent etre declarées en C ("extern int nom"),
+En mode scrolling le texte utile doit Ãªtre prÃ©cÃ©dÃ© et suivi de 12 espaces, 
+ ce qui est rÃ©alisÃ© par le programme
+En mode fixe, la longueur du texte doit Ãªtre de 12 caracteres,
+ce qui est rÃ©alisÃ© par le programme
+Rappel pour Ã©criture programme:
+Les variables communes doivent etre declarÃ©es en C ("extern int nom"),
 puis en Asm (en ".global _nom" puis "_nom: .space 2")
  *
- * correction bug N°1 : rset des variables Shift et ShiftBas à partir du C quand
+ * correction bug NÂ°1 : rset des variables Shift et ShiftBas Ã  partir du C quand
  *  on reprogramme une ligne fixe
- * Correction Bug n°2: <reset>  reset amelioré quand on reset sur un scrolling 
- * en cours. Revient maintenant correctement à la présentation d'origine.
- * correction bug N°3 : colors 
+ * Correction Bug nÂ°2: <reset>  reset ameliorÃ© quand on reset sur un scrolling 
+ * en cours. Revient maintenant correctement Ã  la prÃ©sentation d'origine.
+ * correction bug NÂ°3 : colors 
  * Still first uart lissing character
 */
 
@@ -32,14 +32,14 @@ puis en Asm (en ".global _nom" puis "_nom: .space 2")
 /**********************************************************/
 /* V2 du janvier 2018									*/
 /* PIC24F16KA101											*/
-/* Oscillateur 8 Mhz à quartz avec PLL réglé pour FCY =16000000		*/
+/* Oscillateur 8 Mhz Ã  quartz avec PLL rÃ©glÃ© pour FCY =16000000		*/
 // Sortie RS232 9600 sur RB7 en broche 11 du PIC  vers TX interface RS232
-// entrée RS232 9600 sur RB2 en broche 6 du PIC   vers RX interface RS232
+// entrÃ©e RS232 9600 sur RB2 en broche 6 du PIC   vers RX interface RS232
 // Sync  RA6 broche 14
 // Rouge RA4 broche 10 
 // Vert  RB1 broche 3
 // Bleu  RB0 Broche 2 
-// chaines de caractères limitées à 75 caractères sur écran
+// chaines de caractÃ¨res limitÃ©es Ã  75 caractÃ¨res sur Ã©cran
 //*********************************************************
 
 #include <p24F16KA101.h>
@@ -57,7 +57,7 @@ _FOSC( POSCMOD_XT);  //& POSCFREQ_HS) & FCKSM_CSDCMD )
 _FGS(GCP_ON) ;   	  //    Set Code de Protection ON
 _FOSCSEL (FNOSC_PRIPLL);   //(FNOSC_PRIPLL)  Oscillateur XT 8 MHz avec PLL
                           //(FNOSC_FRCPLL Oscillateur RC (bruyant) 8MHz avec PLL
-_FWDT(FWDTEN_OFF);        //    Watchdog Timer non activé
+_FWDT(FWDTEN_OFF);        //    Watchdog Timer non activÃ©
 _FDS( DSWDTEN_OFF & DSBOREN_OFF );
 _FPOR(BOREN_BOR0 & PWRTEN_OFF );
 
@@ -94,15 +94,15 @@ unsigned int offset;
 char * sptr;
 
 int RamStringHaut[100]; ;  //arrays INT (obligatoire) des 100 max char ascii de
-//8 bits rangés sous forme d'entiers 16 bits
-int RamStringBas[100];// Ces deux Arrays sont sauvegardés en EEPROM avec "Write"
+//8 bits rangÃ©s sous forme d'entiers 16 bits
+int RamStringBas[100];// Ces deux Arrays sont sauvegardÃ©s en EEPROM avec "Write"
 
-char VarBuffer[102]="            ";//Buffer pour texte à afficher (12 espaces en init
-char MessageBuffer[100]; // buffer pour entrée clavier
+char VarBuffer[102]="            ";//Buffer pour texte Ã  afficher (12 espaces en init
+char MessageBuffer[100]; // buffer pour entrÃ©e clavier
 char ColBuffer[7]="1234567"; // buffer pour couleur
 
-const char StringHaut[40]={"            PICDREAM II by F1CJN  alain.fort.f1cjn@sfr.fr            "};
-// 12 espaces en début et fin des msg
+const char StringHaut[80]={"            PICDREAM II by F1CJN  alain.fort.f1cjn@sfr.fr            "};
+// 12 espaces en dÃ©but et fin des msg
 const char StringBas[12]={"PICDREAM II "};  // 12 caracteres
 const char CRLF[2]={"\r\n"};
 const char *separateur = { ">" };
@@ -207,7 +207,7 @@ char s[];
   sptr=s;
   while(*sptr !=0)
   {
-       for(i = 0; i < 7000; i++)  // petite tempo entre les caractères
+       for(i = 0; i < 7000; i++)  // petite tempo entre les caractÃ¨res
    while(U1STAbits.UTXBF==1); // Wait until TX buf read for new data
    U1TXREG=*sptr;
    sptr++;
@@ -256,8 +256,8 @@ void enteteraz (void)
  void __attribute__((interrupt, auto_psv)) _U1RXInterrupt(void) 
 {
 
-       if (j > 98) j=99 ; //Limite la taille du test au buffer à 100 carac
-       //téres soit  72 caractères utiles (sans la commande de 4 caracteres
+       if (j > 98) j=99 ; //Limite la taille du test au buffer Ã  100 carac
+       //tÃ©res soit  72 caractÃ¨res utiles (sans la commande de 4 caracteres
        // et sans les 2x 12 espaces)
         {
             MessageBuffer[j] = U1RXREG; //lecture de l'octet du registre RX
@@ -295,14 +295,14 @@ void enteteraz (void)
             for(i = 0; i < 70 && MessageBuffer[4 + i] != '\0'; i++)
             MessageBuffer[i] = MessageBuffer[i + 5];
             }
-            MessageBuffer[i-2] = '\0'; // place fin des message à i-1 afin
-            //de supprimmer le CR à la fin du MessageBuffer
+            MessageBuffer[i-2] = '\0'; // place fin des message Ã  i-1 afin
+            //de supprimmer le CR Ã  la fin du MessageBuffer
             //imprime(MessageBuffer);
             //imprime("T1 T2\r");
              // MESSAGE FIXE
              if (((FixeHaut==1) && (cmd==1)) || ((FixeBas==1) && (cmd==2))) //Si ligne 1 ou ligne 2 fixes
              {
-                 strncpy(VarBuffer,MessageBuffer,11); // Réduit MessageBuffer à 11 characters
+                 strncpy(VarBuffer,MessageBuffer,11); // RÃ©duit MessageBuffer Ã  11 characters
                  strcat(VarBuffer,space12);// Ajout de 12 espaces en fin de VarBuffer
                  if (cmd==1){
                      Shift=0;
@@ -322,10 +322,10 @@ void enteteraz (void)
             // **************   MESSAGE DEROULANT  *******************************
             if (((FixeHaut==0) && (cmd==1)) || ((FixeBas==0) && (cmd==2)))  // Si Ligne1 ou ligne 2 scrolle
              {
-                //-----Ajout de 12 espace en début et fin de message(pour scroll)---
+                //-----Ajout de 12 espace en dÃ©but et fin de message(pour scroll)---
             strcat(MessageBuffer,space12);// Ajout de 12 espaces en fin de buffer
-            char VarBuffer[102]="            "; // 12 espace en début de Varbuffer
-            strcat(VarBuffer,MessageBuffer); //Ajout de 12 espace en début de MessageBuffer
+            char VarBuffer[102]="            "; // 12 espace en dÃ©but de Varbuffer
+            strcat(VarBuffer,MessageBuffer); //Ajout de 12 espace en dÃ©but de MessageBuffer
           
 
             if (cmd==1) {       // ligne1
@@ -344,7 +344,7 @@ void enteteraz (void)
             case 3 :  // C1  Couleur ligne1
             case 4 :  // C2  Couleur ligne2
              //  imprime("c1 c2\r");
-               strncpy(ColBuffer,MessageBuffer,7); // Reduit MessageBuffer à 7 characters
+               strncpy(ColBuffer,MessageBuffer,7); // Reduit MessageBuffer Ã  7 characters
                for(i = 0; i<8 ; i++) // 8 couleurs
                   {
                  pch = strstr (ColBuffer,colors[i]); // Scan des commandes
@@ -370,7 +370,7 @@ void enteteraz (void)
             case 5 : //B1  Couleur Fond1
             case 6 : //B2  Couleur Fond2
              //    imprime("b1 b2\r");
-               strncpy(ColBuffer,MessageBuffer,7); // Reduit MessageBuffer à 7 characters
+               strncpy(ColBuffer,MessageBuffer,7); // Reduit MessageBuffer Ã  7 characters
                // imprime(ColBuffer);
                for(i = 0; i<8 ; i++) // 8 couleurs
                   {
@@ -471,7 +471,7 @@ void enteteraz (void)
                   //----------------------------------------------------
                  memset(MessageBuffer,0,sizeof(MessageBuffer));// RAZ Buffer
                  memset(VarBuffer,0,sizeof(VarBuffer));// RAZ Buffer
-                 j=0; i=0; //par propreté
+                 j=0; i=0; //par propretÃ©
                  _U1RXIF=0;
                  return; // On sort des "Case"
                  }
@@ -492,8 +492,8 @@ int main(void)
  //                 Set up I/O Port
  AD1PCFG=0xFFFF;    //Analog ports as Digital I/O
  TRISA=0;          // Port A avec des sorties
- TRISB=0b0000000000000110;    // Port B avec sorties et RB2 en entrée (UART RX)
- //et RB1 en entrée(pin5)pour le routage du CI
+ TRISB=0b0000000000000110;    // Port B avec sorties et RB2 en entrÃ©e (UART RX)
+ //et RB1 en entrÃ©e(pin5)pour le routage du CI
  
 U1BRG = BRGVAL;   // BAUD Rate Setting for 9600
 U1MODE=0; //clear all U1MODE register
@@ -501,13 +501,13 @@ U1STA = 0x0440; //clear all U1STA register and enable Transmit
 U1MODEbits.UARTEN = 1; // Enable UART1
 U1STAbits.UTXEN = 1; // Enable UART1 TX 
 IEC0bits.U1RXIE = 1 ;   // RX Interrupt enable
-U1STAbits.URXISEL = 1 ; // RX interruption à chaque caractère
+U1STAbits.URXISEL = 1 ; // RX interruption Ã  chaque caractÃ¨re
 IFS0bits.U1RXIF = 0;    // Clear UART1 Received interrupt flag
-IPC2bits.U1RXIP = 2 ;   // RX interruption avec niveau de priorité 2
+IPC2bits.U1RXIP = 2 ;   // RX interruption avec niveau de prioritÃ© 2
 
 __delay32(1000000);  // delay de 1.000.000 cycles
  
- enteteraz(); // message sur RS232  19200 bauds à la mise sous tension
+ enteteraz(); // message sur RS232  19200 bauds Ã  la mise sous tension
   
 msg_init(); // Initialisation avec lecture EEPROM;
 
