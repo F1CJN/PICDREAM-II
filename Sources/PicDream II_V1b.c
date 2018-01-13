@@ -262,7 +262,7 @@ void enteteraz (void)
         {
             MessageBuffer[j] = U1RXREG; //lecture de l'octet du registre RX
 
-           MessageBuffer[j] = tolower(MessageBuffer[j]);
+           //MessageBuffer[j] = tolower(MessageBuffer[j]);
                     
             if(MessageBuffer[j] == 0x0D) //Test pour la touche CR
 
